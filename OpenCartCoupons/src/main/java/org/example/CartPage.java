@@ -13,6 +13,8 @@ public class CartPage {
 
     By clickToUseCoupon = By.cssSelector("form#form-coupon  .btn.btn-primary");
 
+    By clearCart = By.cssSelector(".table-responsive .fa-circle-xmark");
+
 
     public CartPage(WebDriver driver) {
         this.driver = driver;
@@ -33,5 +35,8 @@ public class CartPage {
         var element = driver.findElement(clickToUseCoupon);
         JavascriptExecutor executor = (JavascriptExecutor)driver;
         executor.executeScript("arguments[0].click();", element);
+    }
+    public void clearCart(){
+        driver.findElement(clearCart).click();
     }
 }
