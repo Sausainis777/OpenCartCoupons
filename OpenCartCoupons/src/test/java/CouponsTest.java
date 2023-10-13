@@ -17,8 +17,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CouponsTest {
     WebDriver driver;
@@ -44,6 +46,7 @@ public class CouponsTest {
     }
 
     public int getNumber(String text) {
+        
         return Integer.parseInt(text);
 
     }
@@ -51,7 +54,7 @@ public class CouponsTest {
 
     @ParameterizedTest
     @CsvFileSource(files = "src/main/resources/Cupons.csv")
-    void coupons(String number) throws InterruptedException {
+    void coupons(String number, int value, String type) throws InterruptedException {
 
         MainPage mainPage = new MainPage(driver);
         LoginPage loginpage = new LoginPage(driver);
@@ -85,24 +88,34 @@ public class CouponsTest {
 
         cartPage.clickToUseCoupon();
 
-        assertEquals("Coupon (1111)", driver.findElement(By.xpath("/html//tfoot[@id='checkout-total']//strong[.='Coupon (1111)']")).getText());
-        assertEquals("$-10.00", driver.findElement(By.cssSelector("tfoot#checkout-total > tr:nth-of-type(2) > td:nth-of-type(2)")).getText());
-        assertEquals("$325.99", driver.findElement(By.xpath("//tfoot[@id='checkout-total']/tr[5]/td[2]")).getText());
+
+        Thread.sleep(3000);
+
+        int subTotal = getNumber(checkPrice.subTotal().replace("$", "").replace(".", "").replace(",", ""));
+
+        String formattedValue = "";
+        String formattedPercentage = "";
 
 
+        if (type.equalsIgnoreCase("FLAT")) {
+            formattedValue = String.format(Locale.US, "$%.2f", -value * 1.0);
+            assertEquals(formattedValue, driver.findElement(By.xpath("//tfoot[@id='checkout-total']/tr[2]/td[2]")).getText());
 
-        int subTotal = getNumber(checkPrice.subTotal().replace("$", "").replace(".", ""));
+        } else if (type.equalsIgnoreCase("PERCENTAGE")) {
+            formattedPercentage = String.format(Locale.US, "$%.2f", -subTotal * 10 / 10000.0);
+            assertEquals(formattedPercentage, driver.findElement(By.xpath("//tfoot[@id='checkout-total']/tr[2]/td[2]")).getText());
+        }
+
         int coupon = getNumber(checkPrice.coupon().replace("$", "").replace(".", ""));
         int ecoTax = getNumber(checkPrice.ecoTax().replace("$", "").replace(".", ""));
         int vat = getNumber(checkPrice.vat().replace("$", "").replace(".", ""));
         int total = getNumber(checkPrice.total().replace("$", "").replace(".", ""));
         int totalSum = subTotal + coupon + ecoTax + vat;
-       
-
-        assertEquals(total,totalSum);
+        assertEquals(total, totalSum);
 
 
         cartPage.clearCart();
+        driver.quit();
     }
 
 
