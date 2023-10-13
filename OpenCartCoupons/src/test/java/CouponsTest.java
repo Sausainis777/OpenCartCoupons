@@ -102,7 +102,7 @@ public class CouponsTest {
             assertEquals(formattedValue, driver.findElement(By.xpath("//tfoot[@id='checkout-total']/tr[2]/td[2]")).getText());
 
         } else if (type.equalsIgnoreCase("PERCENTAGE")) {
-            formattedPercentage = String.format(Locale.US, "$%.2f", -subTotal * 10 / 10000.0);
+            formattedPercentage = String.format(Locale.US, "$%.2f", -subTotal * value/ 10000.0);
             assertEquals(formattedPercentage, driver.findElement(By.xpath("//tfoot[@id='checkout-total']/tr[2]/td[2]")).getText());
         }
 
