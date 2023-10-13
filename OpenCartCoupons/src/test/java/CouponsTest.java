@@ -43,6 +43,11 @@ public class CouponsTest {
 //        driver.quit();
     }
 
+    public int getNumber(String text) {
+        return Integer.parseInt(text);
+
+    }
+
 
     @ParameterizedTest
     @CsvFileSource(files = "src/main/resources/Cupons.csv")
@@ -82,22 +87,23 @@ public class CouponsTest {
 
         assertEquals("Coupon (1111)", driver.findElement(By.xpath("/html//tfoot[@id='checkout-total']//strong[.='Coupon (1111)']")).getText());
         assertEquals("$-10.00", driver.findElement(By.cssSelector("tfoot#checkout-total > tr:nth-of-type(2) > td:nth-of-type(2)")).getText());
-
-        double subTotal = getNumber(checkPrice.subTotal().replace("$", "").replace(".",""));
-        double coupon = getNumber(checkPrice.coupon().replace("$", ""));
-        double ecoTax = getNumber(checkPrice.ecoTax().replace("$", ""));
-        double vat = getNumber(checkPrice.vat().replace("$", ""));
-
-
-        System.out.println(subTotal);
+        assertEquals("$325.99", driver.findElement(By.xpath("//tfoot[@id='checkout-total']/tr[5]/td[2]")).getText());
 
 
 
+        int subTotal = getNumber(checkPrice.subTotal().replace("$", "").replace(".", ""));
+        int coupon = getNumber(checkPrice.coupon().replace("$", "").replace(".", ""));
+        int ecoTax = getNumber(checkPrice.ecoTax().replace("$", "").replace(".", ""));
+        int vat = getNumber(checkPrice.vat().replace("$", "").replace(".", ""));
+        int total = getNumber(checkPrice.total().replace("$", "").replace(".", ""));
+        int totalSum = subTotal + coupon + ecoTax + vat;
+       
 
+        assertEquals(total,totalSum);
+
+
+        cartPage.clearCart();
     }
 
-    public int getNumber(String text) {
-        return Integer.parseInt(text);
-    }
 
 }
